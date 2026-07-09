@@ -1,0 +1,437 @@
+/* ── IBM Carbon design tokens (subset) ──────────────────────────────────── */
+:root {
+  --ibm-blue-60:   #0043ce;
+  --ibm-blue-70:   #002d9c;
+  --ibm-blue-10:   #edf5ff;
+  --ibm-gray-100:  #161616;
+  --ibm-gray-90:   #262626;
+  --ibm-gray-80:   #393939;
+  --ibm-gray-20:   #e0e0e0;
+  --ibm-gray-10:   #f4f4f4;
+  --ibm-white:     #ffffff;
+  --ibm-red-60:    #da1e28;
+  --ibm-green-50:  #24a148;
+  --ibm-yellow-30: #f1c21b;
+  --ibm-purple-60: #6929c4;
+  --ibm-teal-50:   #009d9a;
+  --ibm-orange-40: #ff832b;
+
+  --font: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', 'Menlo', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; }
+
+body {
+  font-family: var(--font);
+  background: var(--ibm-gray-10);
+  color: var(--ibm-gray-100);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.ca-header {
+  background: var(--ibm-gray-100);
+  height: 48px;
+  flex-shrink: 0;
+}
+.ca-header__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.ca-header__logo {
+  width: 60px;
+  height: 26px;
+  flex-shrink: 0;
+}
+.ca-header__product {
+  color: var(--ibm-white);
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.ca-header__tag {
+  margin-left: auto;
+  color: var(--ibm-gray-20);
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+/* ── Main ───────────────────────────────────────────────────────────────── */
+.ca-main {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.ca-section { background: var(--ibm-white); padding: 2rem; border: 1px solid var(--ibm-gray-20); }
+.ca-section + .ca-section { margin-top: 1rem; }
+
+.ca-h1 {
+  font-size: 1.75rem;
+  font-weight: 300;
+  color: var(--ibm-gray-100);
+  margin-bottom: 0.5rem;
+}
+.ca-muted {
+  color: var(--ibm-gray-80);
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+/* ── Product selector — vertical pillar/category layout ─────────────────── */
+.ca-product-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 1.5rem;
+}
+
+.ca-pillar {
+  margin-bottom: 1.5rem;
+}
+.ca-pillar__header {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ibm-gray-80);
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 2px solid var(--ibm-gray-20);
+}
+.ca-pillar__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ca-category {}
+.ca-category__name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ibm-gray-100);
+  margin-bottom: 0.5rem;
+}
+.ca-category__products {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.ca-category__empty {
+  font-size: 0.8rem;
+  color: var(--ibm-gray-80);
+  font-style: italic;
+}
+
+/* ── Product card ───────────────────────────────────────────────────────── */
+.ca-product-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--ibm-gray-20);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.1s, background 0.1s;
+  background: var(--ibm-white);
+  border-radius: 2px;
+}
+.ca-product-card:hover { border-color: var(--ibm-blue-60); background: var(--ibm-blue-10); }
+.ca-product-card.selected {
+  border-color: var(--ibm-blue-60);
+  background: var(--ibm-blue-10);
+}
+.ca-product-card__check {
+  width: 14px; height: 14px;
+  border: 1.5px solid var(--ibm-gray-20);
+  border-radius: 2px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.1s, background 0.1s;
+}
+.ca-product-card.selected .ca-product-card__check {
+  border-color: var(--ibm-blue-60);
+  background: var(--ibm-blue-60);
+}
+.ca-product-card.selected .ca-product-card__check::after {
+  content: '';
+  width: 8px; height: 5px;
+  border-left: 1.5px solid #fff;
+  border-bottom: 1.5px solid #fff;
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+.ca-product-card__name { font-size: 0.8rem; font-weight: 400; }
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+.ca-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  height: 40px; padding: 0 1rem;
+  font-family: var(--font); font-size: 0.875rem;
+  border: none; cursor: pointer; transition: background 0.1s;
+  text-decoration: none;
+}
+.ca-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.ca-btn--primary { background: var(--ibm-blue-60); color: #fff; }
+.ca-btn--primary:not(:disabled):hover { background: var(--ibm-blue-70); }
+.ca-btn--ghost {
+  background: transparent; color: var(--ibm-blue-60);
+  border: 1px solid var(--ibm-blue-60);
+}
+.ca-btn--ghost:hover { background: var(--ibm-blue-10); }
+.ca-btn--secondary { background: var(--ibm-gray-80); color: #fff; }
+.ca-btn--secondary:hover { background: var(--ibm-gray-90); }
+
+.ca-actions { display: flex; align-items: center; gap: 1rem; }
+.ca-status { font-size: 0.8rem; color: var(--ibm-gray-80); font-style: italic; }
+
+/* ── Tabs ───────────────────────────────────────────────────────────────── */
+.ca-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--ibm-gray-20);
+  margin-bottom: 1.5rem;
+}
+.ca-tab {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-family: var(--font); font-size: 0.875rem; color: var(--ibm-gray-80);
+  cursor: pointer;
+}
+.ca-tab:hover { color: var(--ibm-gray-100); background: var(--ibm-gray-10); }
+.ca-tab--active { color: var(--ibm-gray-100); border-bottom-color: var(--ibm-blue-60); font-weight: 600; }
+
+.ca-badge {
+  background: var(--ibm-blue-60); color: #fff;
+  font-size: 0.7rem; font-weight: 600;
+  padding: 1px 7px; border-radius: 999px;
+  min-width: 20px; text-align: center;
+}
+
+/* ── Toolbar ────────────────────────────────────────────────────────────── */
+.ca-toolbar {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin-bottom: 1rem; flex-wrap: wrap;
+}
+.ca-input {
+  height: 40px; padding: 0 1rem;
+  border: 1px solid var(--ibm-gray-20); background: var(--ibm-white);
+  font-family: var(--font); font-size: 0.875rem;
+  flex: 1; min-width: 200px; max-width: 360px;
+}
+.ca-input:focus { outline: 2px solid var(--ibm-blue-60); outline-offset: 0; }
+
+/* ── Thread cards ───────────────────────────────────────────────────────── */
+.ca-thread {
+  border: 1px solid var(--ibm-gray-20);
+  margin-bottom: 0.75rem;
+  background: var(--ibm-white);
+}
+.ca-thread__header {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+}
+.ca-thread__header:hover { background: var(--ibm-gray-10); }
+
+.ca-thread__badge {
+  flex-shrink: 0; margin-top: 2px;
+  padding: 2px 8px; font-size: 0.7rem; font-weight: 600; border-radius: 999px;
+  white-space: nowrap;
+}
+.ca-thread__badge--zero  { background: var(--ibm-red-60);    color: #fff; }
+.ca-thread__badge--low   { background: var(--ibm-yellow-30); color: var(--ibm-gray-100); }
+.ca-thread__badge--mid   { background: var(--ibm-gray-20);   color: var(--ibm-gray-100); }
+
+.ca-thread__meta { flex: 1; min-width: 0; }
+.ca-thread__title { font-size: 0.9rem; font-weight: 600; line-height: 1.4; margin-bottom: 0.25rem; }
+.ca-thread__title a { color: var(--ibm-blue-60); text-decoration: none; }
+.ca-thread__title a:hover { text-decoration: underline; }
+.ca-thread__info { font-size: 0.75rem; color: var(--ibm-gray-80); }
+.ca-thread__product-tag {
+  display: inline-block; padding: 1px 7px; font-size: 0.7rem;
+  background: var(--ibm-purple-60); color: #fff; border-radius: 2px; margin-right: 0.4rem;
+}
+.ca-thread__chevron {
+  flex-shrink: 0; width: 20px; height: 20px; color: var(--ibm-gray-80);
+  transition: transform 0.2s;
+}
+.ca-thread.open .ca-thread__chevron { transform: rotate(180deg); }
+
+.ca-thread__body { padding: 0 1rem 1rem; border-top: 1px solid var(--ibm-gray-20); }
+
+.ca-thread__question {
+  background: var(--ibm-gray-10); padding: 0.75rem 1rem;
+  font-size: 0.8rem; line-height: 1.6; white-space: pre-wrap;
+  max-height: 160px; overflow-y: auto;
+  color: var(--ibm-gray-80); margin: 0.75rem 0;
+  border-left: 3px solid var(--ibm-gray-20);
+}
+
+.ca-draft-box { margin-top: 0.75rem; }
+.ca-draft-box__label {
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--ibm-gray-80); margin-bottom: 0.4rem;
+}
+.ca-draft-box__actions { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+.ca-draft-content {
+  font-family: var(--font); font-size: 0.85rem; line-height: 1.6;
+  width: 100%; min-height: 120px; padding: 0.75rem;
+  border: 1px solid var(--ibm-gray-20); background: var(--ibm-white);
+  resize: vertical; white-space: pre-wrap; outline: none;
+  color: var(--ibm-gray-100);
+}
+.ca-draft-content:focus { border-color: var(--ibm-blue-60); }
+.ca-draft-content--placeholder { color: var(--ibm-gray-80); font-style: italic; }
+.ca-draft-spinner { font-size: 0.8rem; color: var(--ibm-gray-80); font-style: italic; padding: 0.5rem 0; }
+
+/* ── Analytics ──────────────────────────────────────────────────────────── */
+.ca-themes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.ca-theme-card {
+  border: 1px solid var(--ibm-gray-20);
+  padding: 1rem;
+  background: var(--ibm-white);
+}
+.ca-theme-card__header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+.ca-theme-card__dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.ca-theme-card__name { font-weight: 600; font-size: 0.9rem; }
+.ca-theme-card__desc { font-size: 0.8rem; color: var(--ibm-gray-80); margin-bottom: 0.75rem; line-height: 1.5; }
+.ca-theme-card__bar-wrap { background: var(--ibm-gray-20); height: 6px; border-radius: 3px; margin-bottom: 0.5rem; }
+.ca-theme-card__bar { height: 100%; border-radius: 3px; }
+.ca-theme-card__count { font-size: 0.75rem; color: var(--ibm-gray-80); }
+.ca-theme-card__threads { margin-top: 0.5rem; font-size: 0.75rem; }
+.ca-theme-card__thread-link { color: var(--ibm-blue-60); display: block; margin-top: 3px; }
+.ca-theme-card__thread-link:hover { text-decoration: underline; }
+
+/* Bar chart section */
+.ca-bar-chart { margin-top: 1.5rem; }
+.ca-bar-chart__row {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin-bottom: 0.6rem; font-size: 0.8rem;
+}
+.ca-bar-chart__label { width: 160px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ibm-gray-100); }
+.ca-bar-chart__track { flex: 1; background: var(--ibm-gray-20); height: 20px; border-radius: 2px; overflow: hidden; }
+.ca-bar-chart__fill { height: 100%; border-radius: 2px; display: flex; align-items: center; padding-left: 8px; }
+.ca-bar-chart__val { font-size: 0.7rem; color: #fff; font-weight: 600; }
+
+/* ── Utilities ──────────────────────────────────────────────────────────── */
+.ca-hidden { display: none !important; }
+.ca-skeleton {
+  background: linear-gradient(90deg, var(--ibm-gray-20) 25%, var(--ibm-gray-10) 50%, var(--ibm-gray-20) 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.2s infinite;
+  border-radius: 2px;
+}
+@keyframes skeleton { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+.ca-empty {
+  text-align: center; padding: 3rem 1rem;
+  color: var(--ibm-gray-80); font-size: 0.9rem;
+}
+.ca-error { color: var(--ibm-red-60); font-size: 0.875rem; padding: 0.75rem; border: 1px solid var(--ibm-red-60); background: #fff1f1; }
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+.ca-footer {
+  text-align: center; font-size: 0.75rem; color: var(--ibm-gray-80);
+  padding: 1rem; border-top: 1px solid var(--ibm-gray-20);
+  background: var(--ibm-white); margin-top: auto;
+}
+
+/* ── Zero-reply highlight section ───────────────────────────────────────── */
+.ca-zero-section {
+  border: 2px solid var(--ibm-red-60);
+  background: #fff1f1;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+.ca-zero-section__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--ibm-red-60);
+  margin-bottom: 0.75rem;
+}
+.ca-badge--red { background: var(--ibm-red-60); }
+.ca-zero-section__list { display: flex; flex-direction: column; gap: 0.4rem; }
+.ca-zero-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0.75rem;
+  background: var(--ibm-white);
+  border: 1px solid #ffd7d9;
+}
+.ca-zero-item__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.ca-zero-item__product {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  background: var(--ibm-red-60);
+  color: #fff;
+  border-radius: 2px;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.ca-zero-item__title { font-size: 0.875rem; line-height: 1.4; flex: 1; min-width: 0; }
+.ca-zero-item__title a { color: var(--ibm-gray-100); text-decoration: none; font-weight: 500; }
+.ca-zero-item__title a:hover { color: var(--ibm-blue-60); text-decoration: underline; }
+.ca-zero-item__days {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: var(--ibm-yellow-30);
+  color: var(--ibm-gray-100);
+}
+.ca-zero-item__days--urgent {
+  background: var(--ibm-red-60);
+  color: #fff;
+}
+.ca-zero-item__header { cursor: pointer; }
+.ca-zero-item__header:hover { background: #fff0f0; }
+.ca-zero-item.open .ca-thread__chevron { transform: rotate(180deg); }
+.ca-zero-item__body {
+  border-top: 1px solid #ffd7d9;
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+/* ── Results header (back button) ───────────────────────────────────────── */
+.ca-results-header {
+  display: flex;
+  align-items: center;
+  padding-bottom: 1rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--ibm-gray-20);
+}
+.ca-back-btn { color: var(--ibm-blue-60); font-weight: 500; }
+
+/* ── Tab panels ─────────────────────────────────────────────────────────── */
+.ca-tab-panel { display: block; }

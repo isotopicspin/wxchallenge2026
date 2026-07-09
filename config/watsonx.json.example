@@ -1,0 +1,7 @@
+{
+  "_comment": "Copy this file to watsonx.json and fill in your TechZone credentials",
+  "apiKey": "YOUR_IBM_CLOUD_API_KEY",
+  "projectId": "YOUR_WATSONX_PROJECT_ID",
+  "url": "https://us-south.ml.cloud.ibm.com",
+  "modelId": "ibm/granite-3-8b-instruct"
+}

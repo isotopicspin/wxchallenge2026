@@ -1,0 +1,84 @@
+{
+  "categories": [
+    {
+      "id": "ai-powered-productivity",
+      "name": "AI-Powered Productivity",
+      "pillar": "Data",
+      "products": [
+        {
+          "id": "orchestrate",
+          "name": "watsonx Orchestrate",
+          "communityKey": "3ad46381-9535-462e-85c9-568b21f4b067"
+        },
+        {
+          "id": "bob",
+          "name": "Bob (watsonx Assistant)",
+          "communityKey": "300ac388-08f0-427e-a600-0199bfc9dd2a"
+        }
+      ]
+    },
+    {
+      "id": "data-trust-planning",
+      "name": "Data Trust & Planning",
+      "pillar": "Data",
+      "products": [
+        {
+          "id": "guardium",
+          "name": "Guardium",
+          "communityKey": "aa1a6549-4b51-421a-9c67-6dd41e65ef85"
+        },
+        {
+          "id": "planning-analytics",
+          "name": "Planning Analytics",
+          "communityKey": "8fde0600-e22b-4178-acf5-bf4eda43146b"
+        },
+        {
+          "id": "streamsets",
+          "name": "StreamSets",
+          "communityKey": "971a803b-7763-4ee4-bef3-0194750c4201"
+        }
+      ]
+    },
+    {
+      "id": "devops",
+      "name": "DevOps",
+      "pillar": "Automation",
+      "products": []
+    },
+    {
+      "id": "integration",
+      "name": "Integration",
+      "pillar": "Automation",
+      "products": []
+    },
+    {
+      "id": "secure-access-identity",
+      "name": "Secure Access & Identity",
+      "pillar": "Automation",
+      "products": [
+        {
+          "id": "ibm-verify",
+          "name": "IBM Verify",
+          "communityKey": "e7c36119-46d7-42f2-97a9-b44f0cc89c6d"
+        },
+        {
+          "id": "ns1-connect",
+          "name": "NS1 Connect",
+          "communityKey": "5a69b903-4d5f-4aaa-a21d-018ab33b60e2"
+        }
+      ]
+    },
+    {
+      "id": "asset-op-optimization",
+      "name": "Asset & Op Optimization",
+      "pillar": "Automation",
+      "products": [
+        {
+          "id": "maximo",
+          "name": "Maximo",
+          "communityKey": "3d7261ae-48f7-481d-b675-a40eb407e0fd"
+        }
+      ]
+    }
+  ]
+}
