@@ -184,19 +184,28 @@ async function fetchThreadBody(threadUrl) {
  * Full scan: returns { open, all }
  *   open — unanswered/open threads enriched with body text (for report tab + draft answers)
  *   all  — every thread title (for theme analytics, includes answered threads)
+ * @param {string[]} exclusions - phrases to match against thread titles (case-insensitive); matching threads are dropped
  */
-async function scanGroup(communityKey, productName, limit = 10) {
+async function scanGroup(communityKey, productName, limit = 10, exclusions = []) {
   const threads = await fetchThreadList(communityKey, 5);
-  console.log(`[${productName}] scraped ${threads.length} threads total (${threads.filter(t => !t.answered).length} open, ${threads.filter(t => t.answered).length} answered)`);
 
-  const open = threads.filter(t => !t.answered).slice(0, limit);
+  // Drop threads whose title contains any excluded phrase
+  const lowerExclusions = exclusions.map(e => e.toLowerCase());
+  const filtered = lowerExclusions.length
+    ? threads.filter(t => !lowerExclusions.some(ex => t.title.toLowerCase().includes(ex)))
+    : threads;
+
+  const excluded = threads.length - filtered.length;
+  console.log(`[${productName}] scraped ${threads.length} threads (${filtered.filter(t => !t.answered).length} open, ${filtered.filter(t => t.answered).length} answered${excluded ? `, ${excluded} excluded` : ''})`);
+
+  const open = filtered.filter(t => !t.answered).slice(0, limit);
   const enriched = await Promise.all(open.map(async t => ({
     ...t,
     product: productName,
     body: await fetchThreadBody(t.url),
   })));
 
-  const all = threads.map(t => ({ ...t, product: productName }));
+  const all = filtered.map(t => ({ ...t, product: productName }));
   return { open: enriched, all };
 }
 

@@ -60,7 +60,27 @@ Edit `config/watsonx.json`:
 
 Edit `config/groups.json` and add the `communityKey` for each IBM product group you want to scan. The community key is the `communitykey=` query parameter from the IBM Community URL.
 
-### 4. Run
+### 4. Exclude threads by title keyword or phrase
+
+Open `config/groups.json` and add words or phrases to the `"exclusions"` array at the top of the file:
+
+```json
+{
+  "exclusions": [
+    "TechXchange",
+    "webinar registration"
+  ],
+  ...
+}
+```
+
+- Matching is **case-insensitive** and checks whether the phrase appears **anywhere** in the thread title.
+- A thread is hidden from both the Unanswered Threads tab and Theme Analytics if its title matches any entry.
+- Add as many entries as needed; remove an entry to stop filtering it.
+- The server logs how many threads were excluded per product on each scan.
+- Changes take effect on the next scan — no restart required.
+
+### 5. Run
 
 ```bash
 npm start

@@ -1,4 +1,5 @@
 {
+  "exclusions": [],
   "categories": [
     {
       "id": "ai-powered-productivity",
@@ -14,6 +15,11 @@
           "id": "bob",
           "name": "Bob (watsonx Assistant)",
           "communityKey": "300ac388-08f0-427e-a600-0199bfc9dd2a"
+        },
+        {
+          "id": "watsonx-governance",
+          "name": "watsonx.governance",
+          "communityKey": "803d3318-9b29-4131-be29-018a27c5c38d"
         }
       ]
     },

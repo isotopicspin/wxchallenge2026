@@ -26,6 +26,9 @@ const groups = JSON.parse(
   fs.readFileSync(path.join(__dirname, '../config/groups.json'), 'utf8')
 );
 
+// Phrases in thread titles that should be excluded from results (case-insensitive)
+const titleExclusions = groups.exclusions || [];
+
 // Flatten all products from all categories for easy lookup
 const allProducts = groups.categories.flatMap(c => c.products);
 
@@ -48,7 +51,7 @@ app.post('/api/scan', async (req, res) => {
   if (!selected.length) return res.status(400).json({ error: 'No matching products found' });
   try {
     const results = await Promise.all(
-      selected.map(p => scanGroup(p.communityKey, p.name, limit))
+      selected.map(p => scanGroup(p.communityKey, p.name, limit, titleExclusions))
     );
     res.json({
       threads:    results.flatMap(r => r.open),  // unanswered/open — for report tab
