@@ -483,3 +483,63 @@ body {
   color: var(--ibm-gray-80);
   font-style: italic;
 }
+/* ── Excluded threads section ───────────────────────────────────────────── */
+.ca-excluded-section {
+  border: 1px solid var(--ibm-gray-20);
+  background: var(--ibm-gray-10);
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+.ca-excluded-section__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--ibm-gray-80);
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+.ca-badge--gray { background: var(--ibm-gray-80); }
+.ca-excluded-section__list { display: flex; flex-direction: column; gap: 0.3rem; }
+.ca-excluded-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--ibm-white);
+  border: 1px solid var(--ibm-gray-20);
+  font-size: 0.8rem;
+  flex-wrap: wrap;
+}
+.ca-excluded-item__product {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  background: var(--ibm-gray-80);
+  color: #fff;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.ca-excluded-item__title {
+  flex: 1;
+  min-width: 0;
+  color: var(--ibm-gray-80);
+  text-decoration: none;
+  font-style: italic;
+}
+.ca-excluded-item__title:hover { color: var(--ibm-blue-60); text-decoration: underline; }
+.ca-excluded-item__age {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: var(--ibm-gray-80);
+  white-space: nowrap;
+}
+.ca-excluded-item__status {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: var(--ibm-gray-80);
+  white-space: nowrap;
+}

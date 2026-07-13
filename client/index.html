@@ -119,6 +119,16 @@
           <input id="filter-input" class="ca-input" type="search" placeholder="Filter threads…" />
         </div>
         <div id="threads-list"></div>
+
+        <!-- Excluded threads -->
+        <div id="excluded-section" class="ca-excluded-section ca-hidden">
+          <div class="ca-excluded-section__header">
+            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 8h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Excluded by filter rules
+            <span id="excluded-count" class="ca-badge ca-badge--gray">0</span>
+          </div>
+          <div id="excluded-list" class="ca-excluded-section__list"></div>
+        </div>
       </div>
 
       <!-- Analytics tab -->

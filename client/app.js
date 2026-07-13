@@ -16,6 +16,11 @@ let allThreads   = [];   // every thread incl. answered — used for analytics
 let allThemes    = [];
 let selectedIds  = new Set();
 let classifying  = false; // true while /api/classify is in-flight
+let openThreads     = [];   // unanswered/open — shown in report tab
+let allThreads      = [];   // every thread incl. answered — used for analytics
+let excludedThreads = [];   // threads hidden by exclusion rules — shown in own section
+let allThemes       = [];
+let selectedIds     = new Set();
 
 // ── DOM refs ──────────────────────────────────────────────────────────────
 const productGrid      = document.getElementById('product-grid');
@@ -33,6 +38,9 @@ const analyticsContent = document.getElementById('analytics-content');
 const zeroSection      = document.getElementById('zero-reply-section');
 const zeroCount        = document.getElementById('zero-count');
 const zeroList         = document.getElementById('zero-reply-list');
+const excludedSection  = document.getElementById('excluded-section');
+const excludedCount    = document.getElementById('excluded-count');
+const excludedList     = document.getElementById('excluded-list');
 
 // ── Boot ──────────────────────────────────────────────────────────────────
 (async () => {
@@ -101,9 +109,10 @@ btnScan.addEventListener('click', async () => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || res.statusText);
 
-    openThreads = data.threads;
-    allThreads  = data.allThreads;
-    allThemes   = [];
+    openThreads     = data.threads;
+    allThreads      = data.allThreads;
+    excludedThreads = data.excludedThreads || [];
+    allThemes       = [];
     scanStatus.textContent = '';
     showResults();
     // Fire classification in the background — badges appear once it resolves
@@ -120,6 +129,7 @@ function showResults() {
   tabCount.textContent = openThreads.length;
   renderZeroReplies(openThreads);
   renderThreads(openThreads);
+  renderExcluded(excludedThreads);
   analyticsContent.innerHTML = '';
   analyseStatus.textContent = '';
 }
@@ -243,6 +253,7 @@ filterInput.addEventListener('input', () => {
   );
   renderZeroReplies(filtered);
   renderThreads(filtered);
+  // Excluded section is not filtered — always shows the full exclusion list
 });
 
 // ── Thread list ───────────────────────────────────────────────────────────
@@ -487,11 +498,35 @@ function classifyBadgesHtml(thread) {
       </span>
     </div>
     ${rationaleLine}`;
+// ── Excluded threads section ──────────────────────────────────────────────
+/**
+ * Renders the "Excluded by filter rules" section below the thread list.
+ * Shows all threads that were suppressed by the exclusions config, so users
+ * can see what was filtered rather than having it silently disappear.
+ */
+function renderExcluded(threads) {
+  if (!threads.length) { excludedSection.classList.add('ca-hidden'); return; }
+  excludedSection.classList.remove('ca-hidden');
+  excludedCount.textContent = threads.length;
+  excludedList.innerHTML = threads.map(t => `
+    <div class="ca-excluded-item">
+      <span class="ca-excluded-item__product">${escHtml(t.product)}</span>
+      <a class="ca-excluded-item__title" href="${escHtml(t.url)}" target="_blank" rel="noopener">${escHtml(t.title)}</a>
+      ${t.daysAgo != null ? `<span class="ca-excluded-item__age">${t.daysAgo}d ago</span>` : ''}
+      <span class="ca-excluded-item__status">${t.answered ? 'Answered' : 'Unanswered'}</span>
+    </div>
+  `).join('');
 }
 
 // ── Utils ─────────────────────────────────────────────────────────────────
+/**
+ * Escapes a string for safe insertion into HTML.
+ * Prevents XSS when rendering untrusted content from the API.
+ */
 function escHtml(str) {
   return String(str || '')
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
+
+// Made with Bob
