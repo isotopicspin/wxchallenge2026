@@ -7,9 +7,14 @@ const fetch = require('node-fetch');
 const path  = require('path');
 const fs    = require('fs');
 
-const config = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../config/watsonx.json'), 'utf8')
-);
+let config = {};
+try {
+  config = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '../config/watsonx.json'), 'utf8')
+  );
+} catch {
+  // credentials file absent — app starts in offline/demo mode
+}
 const isConfigured = !!(config.apiKey && config.projectId);
 
 let _iamToken  = null;
