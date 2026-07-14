@@ -11,9 +11,10 @@ const cors    = require('cors');
 const path    = require('path');
 const fs      = require('fs');
 
-const { scanGroup }     = require('./scraper');
-const { draftAnswer }   = require('./drafter');
-const { analyseThemes } = require('./analyser');
+const { scanGroup }        = require('./scraper');
+const { draftAnswer }      = require('./drafter');
+const { analyseThemes }    = require('./analyser');
+const { classifyThreads }  = require('./classifier');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -73,6 +74,20 @@ app.post('/api/draft-answer', async (req, res) => {
     res.json({ draft });
   } catch (err) {
     console.error('Draft error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /api/classify ─────────────────────────────────────────────────────
+// Accepts { threads: Thread[] } and returns them with a `classification` field.
+app.post('/api/classify', async (req, res) => {
+  const { threads = [] } = req.body;
+  if (!threads.length) return res.status(400).json({ error: 'No threads provided' });
+  try {
+    const classified = await classifyThreads(threads);
+    res.json({ threads: classified });
+  } catch (err) {
+    console.error('Classify error:', err);
     res.status(500).json({ error: err.message });
   }
 });

@@ -15,6 +15,7 @@ let openThreads  = [];   // unanswered/open — shown in report tab
 let allThreads   = [];   // every thread incl. answered — used for analytics
 let allThemes    = [];
 let selectedIds  = new Set();
+let classifying  = false; // true while /api/classify is in-flight
 
 // ── DOM refs ──────────────────────────────────────────────────────────────
 const productGrid      = document.getElementById('product-grid');
@@ -105,6 +106,8 @@ btnScan.addEventListener('click', async () => {
     allThemes   = [];
     scanStatus.textContent = '';
     showResults();
+    // Fire classification in the background — badges appear once it resolves
+    classifyOpenThreads();
   } catch (e) {
     scanStatus.textContent = `Error: ${e.message}`;
     btnScan.disabled = false;
@@ -132,6 +135,7 @@ function renderZeroReplies(threads) {
         <span class="ca-zero-item__product">${escHtml(t.product)}</span>
         <div class="ca-zero-item__title">
           <a href="${escHtml(t.url)}" target="_blank" rel="noopener">${escHtml(t.title)}</a>
+          ${classifyBadgesHtml(t)}
         </div>
         ${t.daysAgo != null ? `<span class="ca-zero-item__days ${t.daysAgo >= 14 ? 'ca-zero-item__days--urgent' : ''}">${t.daysAgo}d unanswered</span>` : ''}
         <svg class="ca-thread__chevron" viewBox="0 0 16 16"><path d="M8 11L3 5h10z" fill="currentColor"/></svg>
@@ -259,6 +263,7 @@ function renderThreads(threads) {
             <span class="ca-thread__product-tag">${escHtml(t.product)}</span>
             <a href="${escHtml(t.url)}" target="_blank" rel="noopener">${escHtml(t.title)}</a>
           </div>
+          ${classifyBadgesHtml(t)}
           <div class="ca-thread__info">
             ${t.age ? `Posted ${escHtml(t.age)}` : ''}${t.author ? ` by ${escHtml(t.author)}` : ''}${(t.age || t.author) ? ' · ' : ''}${t.unanswered ? '🔴 Unanswered' : '🟡 Open (no accepted answer)'}
           </div>
@@ -406,6 +411,78 @@ function renderAnalytics(themes) {
     <div class="ca-bar-chart">${barRows}</div>
     <div class="ca-themes-grid">${cards}</div>
   `;
+}
+
+// ── Classification ────────────────────────────────────────────────────────
+async function classifyOpenThreads() {
+  if (!openThreads.length) return;
+  classifying = true;
+
+  // Show a brief loading hint in the thread info rows
+  document.querySelectorAll('.ca-classify-loading').forEach(el => {
+    el.textContent = 'Classifying…';
+  });
+
+  try {
+    const res  = await fetch(`${API}/api/classify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ threads: openThreads }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || res.statusText);
+
+    // Merge classification back into openThreads (matched by url)
+    const byUrl = {};
+    data.threads.forEach(t => { byUrl[t.url] = t.classification; });
+    openThreads.forEach(t => {
+      if (byUrl[t.url]) t.classification = byUrl[t.url];
+    });
+
+    // Re-render both thread lists so the badges appear
+    const q = filterInput.value.toLowerCase();
+    const visible = q
+      ? openThreads.filter(t => t.title.toLowerCase().includes(q) || (t.product || '').toLowerCase().includes(q))
+      : openThreads;
+    renderZeroReplies(visible);
+    renderThreads(visible);
+  } catch (e) {
+    console.warn('Classification failed:', e.message);
+  } finally {
+    classifying = false;
+  }
+}
+
+/**
+ * Render the two classification badges (quality + response type) for a thread.
+ * Returns empty string while classification is still loading.
+ */
+function classifyBadgesHtml(thread) {
+  if (!thread.classification) {
+    return classifying ? '<div class="ca-classify-loading">Classifying…</div>' : '';
+  }
+  const c  = thread.classification;
+  const qm = c.qualityMeta  || {};
+  const rm = c.responseMeta || {};
+
+  // Use light text for yellow (light background colour)
+  const qLight = (qm.colour === '#f1c21b') ? ' ca-classify-badge--light' : '';
+  const rLight = '';
+
+  const rationaleLine = c.rationale && !c.rationale.includes('heuristic')
+    ? `<div class="ca-classify-rationale">${escHtml(c.rationale)}</div>`
+    : '';
+
+  return `
+    <div class="ca-classify-row">
+      <span class="ca-classify-badge${qLight}" style="background:${escHtml(qm.colour || '#8d8d8d')}" title="${escHtml(qm.hint || '')}">
+        <span class="ca-classify-badge__dot"></span>${escHtml(qm.label || c.quality)}
+      </span>
+      <span class="ca-classify-badge${rLight}" style="background:${escHtml(rm.colour || '#8d8d8d')}" title="${escHtml(rm.hint || '')}">
+        <span class="ca-classify-badge__dot"></span>${escHtml(rm.label || c.responseType)}
+      </span>
+    </div>
+    ${rationaleLine}`;
 }
 
 // ── Utils ─────────────────────────────────────────────────────────────────

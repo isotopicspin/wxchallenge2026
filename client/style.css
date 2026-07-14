@@ -435,3 +435,51 @@ body {
 
 /* ── Tab panels ─────────────────────────────────────────────────────────── */
 .ca-tab-panel { display: block; }
+
+/* ── Thread classification badges ───────────────────────────────────────── */
+.ca-classify-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+.ca-classify-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 2px 8px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border-radius: 2px;
+  color: #fff;
+  white-space: nowrap;
+  cursor: default;
+}
+/* Dark background badges need a slightly softer white */
+.ca-classify-badge--light {
+  color: var(--ibm-gray-100);
+}
+.ca-classify-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.7);
+  flex-shrink: 0;
+}
+.ca-classify-badge--light .ca-classify-badge__dot {
+  background: rgba(0,0,0,0.35);
+}
+/* Rationale tooltip-style row */
+.ca-classify-rationale {
+  font-size: 0.72rem;
+  color: var(--ibm-gray-80);
+  font-style: italic;
+  margin-top: 0.3rem;
+  line-height: 1.4;
+}
+/* Loading shimmer for classify */
+.ca-classify-loading {
+  font-size: 0.72rem;
+  color: var(--ibm-gray-80);
+  font-style: italic;
+}
