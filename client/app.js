@@ -192,7 +192,9 @@ async function generateZeroDraft(index, zeros) {
 
   draftBtn.disabled = true;
   statusEl.innerHTML = '<span class="ca-draft-spinner">Generating with watsonx.ai…</span>';
+  areaEl.value = '';
   areaEl.classList.add('ca-hidden');
+  copyBtn.classList.add('ca-hidden');
 
   try {
     const res  = await fetch(`${API}/api/draft-answer`, {
@@ -300,7 +302,7 @@ function renderThreads(threads) {
   threadsList.querySelectorAll('.btn-draft').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      generateDraft(parseInt(btn.dataset.index), threads);
+      generateDraft(parseInt(btn.dataset.index), nonZero);
     });
   });
 
@@ -323,7 +325,9 @@ async function generateDraft(index, threads) {
 
   draftBtn.disabled = true;
   statusEl.innerHTML = '<span class="ca-draft-spinner">Generating with watsonx.ai…</span>';
+  areaEl.value = '';
   areaEl.classList.add('ca-hidden');
+  copyBtn.classList.add('ca-hidden');
 
   try {
     const res  = await fetch(`${API}/api/draft-answer`, {

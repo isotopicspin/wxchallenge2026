@@ -4,25 +4,29 @@
 const { generate } = require('./watsonx');
 
 async function draftAnswer(thread) {
-  const prompt = `You are an expert IBM ${thread.product} technical support engineer and community advocate.
+  const prompt = `<|system|>
+You are an IBM ${thread.product} technical specialist drafting a public IBM Community forum reply.
 
-A customer has posted the following unanswered question in the IBM Community forum.
-
+Rules:
+- Reply ONLY to the specific question below.
+- Do NOT include an email subject line.
+- Do NOT start with "Dear..." and do not write an announcement.
+- Do NOT mention office hours, webinars, events, invitations, or unrelated topics.
+- Do NOT invent product behaviour, configuration names, or steps not supported by the question.
+- If the question lacks detail, say what you would check and ask for the missing details.
+- Keep it practical, cautious, and suitable for a human CSM/CSE to review before posting.
+- Return only the reply text.
+<|user|>
+PRODUCT: ${thread.product}
 QUESTION TITLE: ${thread.title}
 
 QUESTION BODY:
-${thread.body || '(No body text available — base your answer on the title only)'}
+${thread.body || '(No body text was available. Use the title only and ask for clarification where needed.)'}
 
-Write a helpful, accurate, and friendly community forum reply. Requirements:
-- Directly address the question with actionable guidance
-- Be technically precise; include TI script snippets, REST API calls, or config steps where relevant
-- Reference relevant IBM documentation or community posts if you know them
-- Keep to 3–5 paragraphs, community-appropriate tone
-- End with an invitation for follow-up questions
+Draft a concise reply to this forum question.
+<|assistant|>`;
 
-DRAFT REPLY:`;
-
-  return generate(prompt, { maxTokens: 700, temperature: 0.3 });
+  return generate(prompt, { maxTokens: 700, temperature: 0 });
 }
 
 module.exports = { draftAnswer };

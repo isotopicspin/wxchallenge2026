@@ -39,6 +39,11 @@ async function generate(prompt, { maxTokens = 800, temperature = 0.3 } = {}) {
     return '[watsonx.ai not yet configured — add your credentials to config/watsonx.json]';
   }
   const token = await getIAMToken();
+
+  // greedy decoding ignores temperature — use 'sample' only when temperature > 0
+  const decoding_method = temperature > 0 ? 'sample' : 'greedy';
+  const samplingParams  = temperature > 0 ? { temperature, repetition_penalty: 1.1 } : {};
+
   const res = await fetch(
     `${config.url}/ml/v1/text/generation?version=2023-05-29`,
     {
@@ -48,7 +53,7 @@ async function generate(prompt, { maxTokens = 800, temperature = 0.3 } = {}) {
         model_id:   config.modelId,
         project_id: config.projectId,
         input:      prompt,
-        parameters: { decoding_method: 'greedy', max_new_tokens: maxTokens, temperature, repetition_penalty: 1.1 },
+        parameters: { decoding_method, max_new_tokens: maxTokens, ...samplingParams },
       }),
     }
   );
