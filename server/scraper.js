@@ -15,6 +15,14 @@ const BASE = 'https://community.ibm.com';
 let _browser = null;
 
 async function getBrowser() {
+  if (_browser) {
+    try {
+      // Check the browser is still alive; this throws if the connection is closed
+      await _browser.version();
+    } catch {
+      _browser = null;
+    }
+  }
   if (!_browser) {
     _browser = await puppeteer.launch({
       headless: true,
@@ -50,13 +58,16 @@ async function scrapePage(communityKey, pageIndex = 1) {
 
   try {
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
-    const url = `${BASE}/community/user/groups/community-home/digestviewer?communitykey=${communityKey}&pageindex=${pageIndex}`;
+    await page.setCacheEnabled(false);
+
+    // Cache buster avoids getting a stale digest page after the app has been running a while.
+    const url = `${BASE}/community/user/groups/community-home/digestviewer?communitykey=${communityKey}&pageindex=${pageIndex}&_=${Date.now()}`;
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
 
-    // Wait for thread rows to appear
-    await page.waitForFunction(
-      () => document.querySelectorAll('tr').length > 3,
-      { timeout: 12000 }
+    // Wait for actual discussion/question links rather than generic table rows.
+    await page.waitForSelector(
+      'a[href*="/discussion/"], a[href*="/question/"], a[href*="/thread/"]',
+      { timeout: 20000 }
     ).catch(() => {});
 
     await new Promise(r => setTimeout(r, 1500));
