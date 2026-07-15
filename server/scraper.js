@@ -162,10 +162,13 @@ async function fetchThreadList(communityKey, maxPages = 3) {
  */
 async function fetchThreadBody(threadUrl) {
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
     const res = await fetch(threadUrl, {
       headers: { 'User-Agent': 'Mozilla/5.0', Accept: 'text/html' },
-      signal: AbortSignal.timeout(15000),
+      signal: controller.signal,
     });
+    clearTimeout(timer);
     if (!res.ok) return '';
     const html = await res.text();
 

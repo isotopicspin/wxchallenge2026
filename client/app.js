@@ -237,7 +237,7 @@ async function generateZeroDraft(index, zeros) {
     copyBtn.classList.remove('ca-hidden');
     draftBtn.textContent = 'Regenerate';
     draftBtn.disabled = false;
-    renderSources(data.sources || [], statusEl.parentElement);
+    renderSources(data.sources || [], statusEl.closest('.ca-draft-box'));
   } catch (e) {
     statusEl.innerHTML = `<span class="ca-error">${e.message}</span>`;
     draftBtn.disabled = false;
@@ -269,6 +269,7 @@ filterInput.addEventListener('input', () => {
   const filtered = openThreads.filter(t =>
     t.title.toLowerCase().includes(q) || (t.product || '').toLowerCase().includes(q)
   );
+  tabCount.textContent = filtered.length;
   renderZeroReplies(filtered);
   renderThreads(filtered);
   // Excluded section is not filtered — always shows the full exclusion list
@@ -394,7 +395,7 @@ async function generateDraft(index, threads) {
     copyBtn.classList.remove('ca-hidden');
     draftBtn.textContent = 'Regenerate';
     draftBtn.disabled = false;
-    renderSources(data.sources || [], statusEl.parentElement);
+    renderSources(data.sources || [], statusEl.closest('.ca-draft-box'));
   } catch (e) {
     statusEl.innerHTML = `<span class="ca-error">${e.message}</span>`;
     draftBtn.disabled = false;
@@ -679,17 +680,19 @@ function showConfirmModal({ heading, text, confirmLabel, thread, onConfirm, conf
   overlay.classList.remove('ca-hidden');
 
   const btnConfirm  = document.getElementById('ca-modal-confirm');
-  const btnConfirm2 = document.getElementById('ca-modal-confirm2');
   const btnCancel   = document.getElementById('ca-modal-cancel');
 
   // Clone to remove stale listeners from previous invocations
   const newConfirm  = btnConfirm.cloneNode(true);
-  const newConfirm2 = btnConfirm2.cloneNode(true);
   const newCancel   = btnCancel.cloneNode(true);
 
   newConfirm.textContent = confirmLabel;
   btnConfirm.replaceWith(newConfirm);
   btnCancel.replaceWith(newCancel);
+
+  // Re-query btnConfirm2 from the live DOM — it may have been replaced in a prior invocation
+  const btnConfirm2 = document.getElementById('ca-modal-confirm2');
+  const newConfirm2 = btnConfirm2.cloneNode(true);
 
   // Show/hide second confirm button
   if (confirm2Label && onConfirm2) {
