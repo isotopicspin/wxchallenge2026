@@ -148,7 +148,12 @@ function renderZeroReplies(threads) {
           ${classifyBadgesHtml(t)}
         </div>
         ${t.daysAgo != null ? `<span class="ca-zero-item__days ${t.daysAgo >= 14 ? 'ca-zero-item__days--urgent' : ''}">${t.daysAgo}d unanswered</span>` : ''}
-        <svg class="ca-thread__chevron" viewBox="0 0 16 16"><path d="M8 11L3 5h10z" fill="currentColor"/></svg>
+        <svg class="ca-thread__chevron ca-thread__chevron--last" viewBox="0 0 16 16"><path d="M8 11L3 5h10z" fill="currentColor"/></svg>
+        <label class="ca-thread__exclude-label ca-thread__exclude-label--right" title="Move to excluded list">
+          <input type="checkbox" class="ca-excl-zero-checkbox" data-index="${i}" />
+          <span class="ca-excl-checkbox__box"></span>
+          <span class="ca-excl-label-text">Exclude</span>
+        </label>
       </div>
       <div class="ca-zero-item__body ca-hidden">
         <div class="ca-thread__question">${t.body ? escHtml(t.body.slice(0, 800)) + (t.body.length > 800 ? '…' : '') : 'Original author added no additional detail.'}</div>
@@ -173,6 +178,22 @@ function renderZeroReplies(threads) {
       const body = item.querySelector('.ca-zero-item__body');
       const isOpen = item.classList.toggle('open');
       body.classList.toggle('ca-hidden', !isOpen);
+    });
+  });
+
+  // Exclude checkboxes
+  zeroList.querySelectorAll('.ca-excl-zero-checkbox').forEach(cb => {
+    cb.addEventListener('change', e => {
+      e.stopPropagation();
+      cb.checked = false;  // revert tick until confirmed
+      const thread = zeros[parseInt(cb.dataset.index)];
+      showConfirmModal({
+        heading:      'Move to excluded list?',
+        text:         'Are you sure you want to move this thread to the excluded list? It will no longer appear in the main unanswered threads.',
+        confirmLabel: 'Move to excluded',
+        thread,
+        onConfirm:    () => excludeThread(thread),
+      });
     });
   });
 
@@ -220,6 +241,7 @@ async function generateZeroDraft(index, zeros) {
     copyBtn.classList.remove('ca-hidden');
     draftBtn.textContent = 'Regenerate';
     draftBtn.disabled = false;
+    renderSources(data.sources || [], statusEl.parentElement);
   } catch (e) {
     statusEl.innerHTML = `<span class="ca-error">${e.message}</span>`;
     draftBtn.disabled = false;
@@ -281,7 +303,12 @@ function renderThreads(threads) {
             ${t.age ? `Posted ${escHtml(t.age)}` : ''}${t.author ? ` by ${escHtml(t.author)}` : ''}${(t.age || t.author) ? ' · ' : ''}${t.unanswered ? '🔴 Unanswered' : '🟡 Open (no accepted answer)'}
           </div>
         </div>
-        <svg class="ca-thread__chevron" viewBox="0 0 16 16"><path d="M8 11L3 5h10z" fill="currentColor"/></svg>
+        <svg class="ca-thread__chevron ca-thread__chevron--last" viewBox="0 0 16 16"><path d="M8 11L3 5h10z" fill="currentColor"/></svg>
+        <label class="ca-thread__exclude-label ca-thread__exclude-label--right" title="Move to excluded list">
+          <input type="checkbox" class="ca-excl-thread-checkbox" data-index="${i}" />
+          <span class="ca-excl-checkbox__box"></span>
+          <span class="ca-excl-label-text">Exclude</span>
+        </label>
       </div>
       <div class="ca-thread__body ca-hidden">
         <div class="ca-thread__question">${t.body ? escHtml(t.body.slice(0, 800)) + (t.body.length > 800 ? '…' : '') : 'Original author added no additional detail.'}</div>
@@ -306,6 +333,23 @@ function renderThreads(threads) {
       const body = card.querySelector('.ca-thread__body');
       const isOpen = card.classList.toggle('open');
       body.classList.toggle('ca-hidden', !isOpen);
+    });
+  });
+
+  // Exclude checkboxes
+  threadsList.querySelectorAll('.ca-excl-thread-checkbox').forEach(cb => {
+    cb.addEventListener('change', e => {
+      e.stopPropagation();
+      cb.checked = false;  // revert tick until confirmed
+      const idx    = parseInt(cb.dataset.index);
+      const thread = nonZero[idx];
+      showConfirmModal({
+        heading:      'Move to excluded list?',
+        text:         'Are you sure you want to move this thread to the excluded list? It will no longer appear in the main unanswered threads.',
+        confirmLabel: 'Move to excluded',
+        thread,
+        onConfirm:    () => excludeThread(thread),
+      });
     });
   });
 
@@ -354,6 +398,7 @@ async function generateDraft(index, threads) {
     copyBtn.classList.remove('ca-hidden');
     draftBtn.textContent = 'Regenerate';
     draftBtn.disabled = false;
+    renderSources(data.sources || [], statusEl.parentElement);
   } catch (e) {
     statusEl.innerHTML = `<span class="ca-error">${e.message}</span>`;
     draftBtn.disabled = false;
@@ -498,24 +543,171 @@ function classifyBadgesHtml(thread) {
       </span>
     </div>
     ${rationaleLine}`;
+/**
+ * Moves a thread from openThreads into excludedThreads and re-renders both lists.
+ * @param {{ url: string }} thread
+ */
+function excludeThread(thread) {
+  openThreads     = openThreads.filter(t => t.url !== thread.url);
+  if (!excludedThreads.find(t => t.url === thread.url)) {
+    excludedThreads.push(thread);
+  }
+  reRenderAllLists();
+}
+
 // ── Excluded threads section ──────────────────────────────────────────────
 /**
  * Renders the "Excluded by filter rules" section below the thread list.
- * Shows all threads that were suppressed by the exclusions config, so users
- * can see what was filtered rather than having it silently disappear.
+ * Each item has a checkbox — ticking it reinstates that thread into the main
+ * open-threads list so it can receive a draft reply.
  */
 function renderExcluded(threads) {
   if (!threads.length) { excludedSection.classList.add('ca-hidden'); return; }
   excludedSection.classList.remove('ca-hidden');
   excludedCount.textContent = threads.length;
-  excludedList.innerHTML = threads.map(t => `
-    <div class="ca-excluded-item">
+  excludedList.innerHTML = threads.map((t, i) => `
+    <div class="ca-excluded-item" id="excl-item-${i}">
       <span class="ca-excluded-item__product">${escHtml(t.product)}</span>
       <a class="ca-excluded-item__title" href="${escHtml(t.url)}" target="_blank" rel="noopener">${escHtml(t.title)}</a>
       ${t.daysAgo != null ? `<span class="ca-excluded-item__age">${t.daysAgo}d ago</span>` : ''}
       <span class="ca-excluded-item__status">${t.answered ? 'Answered' : 'Unanswered'}</span>
+      <label class="ca-excluded-item__reinstate" title="Move to main thread list">
+        <input type="checkbox" class="ca-excl-checkbox" data-index="${i}" />
+        <span class="ca-excl-checkbox__box"></span>
+      </label>
     </div>
   `).join('');
+
+  // Wire up checkboxes — show confirmation modal with two destination choices
+  excludedList.querySelectorAll('.ca-excl-checkbox').forEach(cb => {
+    cb.addEventListener('change', () => {
+      cb.checked = false;  // revert tick until confirmed
+      const idx    = parseInt(cb.dataset.index);
+      const thread = excludedThreads[idx];
+      showConfirmModal({
+        heading:       'Reinstate thread',
+        text:          'Where would you like to move this thread?',
+        confirm2Label: 'Move to Unanswered',
+        onConfirm2:    () => reinstateThread(idx, 'unanswered'),
+        confirmLabel:  'Move to Answered',
+        onConfirm:     () => reinstateThread(idx, 'answered'),
+        thread,
+      });
+    });
+  });
+}
+
+/**
+ * Moves a thread from excludedThreads back into openThreads.
+ * @param {number} idx - index into excludedThreads
+ * @param {'unanswered'|'answered'} destination - which section to place the thread in.
+ *   'unanswered' forces replies=0 (zero-reply highlight); 'answered' forces replies=1 (green section).
+ */
+function reinstateThread(idx, destination) {
+  const thread = { ...excludedThreads[idx] };
+  // Override replies so render functions route to the correct section
+  thread.replies = destination === 'unanswered' ? 0 : Math.max(thread.replies || 0, 1);
+  excludedThreads = excludedThreads.filter((_, i) => i !== idx);
+  if (!openThreads.find(t => t.url === thread.url)) {
+    openThreads.push(thread);
+  }
+  reRenderAllLists();
+}
+
+// ── Sources panel ─────────────────────────────────────────────────────────
+/**
+ * Inserts (or replaces) a sources panel inside the given draft-box container.
+ * Does nothing when the sources array is empty.
+ *
+ * @param {Array<{ title: string, url: string, type: string }>} sources
+ * @param {HTMLElement} draftBoxEl - the .ca-draft-box element to inject into
+ */
+function renderSources(sources, draftBoxEl) {
+  // Remove any previous sources panel in this box
+  const existing = draftBoxEl.querySelector('.ca-sources-panel');
+  if (existing) existing.remove();
+  if (!sources.length) return;
+
+  const ICONS = { docs: '📄', community: '💬', other: '🔗' };
+
+  const panel = document.createElement('div');
+  panel.className = 'ca-sources-panel';
+  panel.innerHTML = `
+    <div class="ca-sources-panel__label">Sources &amp; References</div>
+    <ul class="ca-sources-panel__list">
+      ${sources.map(s => `
+        <li class="ca-sources-panel__item">
+          <span class="ca-sources-panel__icon">${ICONS[s.type] || ICONS.other}</span>
+          <a class="ca-sources-panel__link" href="${escHtml(s.url)}" target="_blank" rel="noopener">
+            ${escHtml(s.title)}
+          </a>
+          <span class="ca-sources-panel__type">${escHtml(s.type || 'ref')}</span>
+        </li>
+      `).join('')}
+    </ul>
+  `;
+  draftBoxEl.appendChild(panel);
+}
+
+/**
+ * Re-renders zero-reply section, main thread list, and excluded section
+ * using the current state of openThreads and excludedThreads.
+ * Respects the active filter input value.
+ */
+function reRenderAllLists() {
+  const q = filterInput.value.toLowerCase();
+  const filtered = openThreads.filter(t =>
+    t.title.toLowerCase().includes(q) || (t.product || '').toLowerCase().includes(q)
+  );
+  tabCount.textContent = openThreads.length;
+  renderZeroReplies(filtered);
+  renderThreads(filtered);
+  renderExcluded(excludedThreads);
+}
+
+// ── Confirmation modal ────────────────────────────────────────────────────
+/**
+ * Shows a shared confirmation modal for moving a thread in either direction.
+ * Pass `confirm2Label` + `onConfirm2` to show a second action button (e.g. two reinstate destinations).
+ *
+ * @param {{ heading: string, text: string, confirmLabel: string, thread: object, onConfirm: Function, confirm2Label?: string, onConfirm2?: Function }} opts
+ */
+function showConfirmModal({ heading, text, confirmLabel, thread, onConfirm, confirm2Label, onConfirm2 }) {
+  const overlay = document.getElementById('ca-modal-overlay');
+  document.getElementById('ca-modal-heading').textContent        = heading;
+  document.getElementById('ca-modal-text').textContent           = text;
+  document.getElementById('ca-modal-thread-title').textContent   = thread.title;
+  document.getElementById('ca-modal-thread-product').textContent = thread.product || '';
+  overlay.classList.remove('ca-hidden');
+
+  const btnConfirm  = document.getElementById('ca-modal-confirm');
+  const btnConfirm2 = document.getElementById('ca-modal-confirm2');
+  const btnCancel   = document.getElementById('ca-modal-cancel');
+
+  // Clone to remove stale listeners from previous invocations
+  const newConfirm  = btnConfirm.cloneNode(true);
+  const newConfirm2 = btnConfirm2.cloneNode(true);
+  const newCancel   = btnCancel.cloneNode(true);
+
+  newConfirm.textContent = confirmLabel;
+  btnConfirm.replaceWith(newConfirm);
+  btnCancel.replaceWith(newCancel);
+
+  // Show/hide second confirm button
+  if (confirm2Label && onConfirm2) {
+    newConfirm2.textContent = confirm2Label;
+    newConfirm2.classList.remove('ca-hidden');
+    newConfirm2.addEventListener('click', () => { close(); onConfirm2(); });
+  } else {
+    newConfirm2.classList.add('ca-hidden');
+  }
+  btnConfirm2.replaceWith(newConfirm2);
+
+  function close() { overlay.classList.add('ca-hidden'); }
+
+  newConfirm.addEventListener('click', () => { close(); onConfirm(); });
+  newCancel.addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); }, { once: true });
 }
 
 // ── Utils ─────────────────────────────────────────────────────────────────
