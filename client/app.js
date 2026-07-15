@@ -11,16 +11,12 @@ const THEME_COLOURS = [
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────
-let openThreads  = [];   // unanswered/open — shown in report tab
-let allThreads   = [];   // every thread incl. answered — used for analytics
-let allThemes    = [];
-let selectedIds  = new Set();
-let classifying  = false; // true while /api/classify is in-flight
 let openThreads     = [];   // unanswered/open — shown in report tab
 let allThreads      = [];   // every thread incl. answered — used for analytics
 let excludedThreads = [];   // threads hidden by exclusion rules — shown in own section
 let allThemes       = [];
 let selectedIds     = new Set();
+let classifying     = false; // true while /api/classify is in-flight
 
 // ── DOM refs ──────────────────────────────────────────────────────────────
 const productGrid      = document.getElementById('product-grid');
@@ -543,6 +539,8 @@ function classifyBadgesHtml(thread) {
       </span>
     </div>
     ${rationaleLine}`;
+}
+
 /**
  * Moves a thread from openThreads into excludedThreads and re-renders both lists.
  * @param {{ url: string }} thread
