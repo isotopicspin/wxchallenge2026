@@ -118,7 +118,21 @@
         <div class="ca-toolbar">
           <input id="filter-input" class="ca-input" type="search" placeholder="Filter threads…" />
         </div>
+        <div class="ca-threads-section-header">
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Threads with a response
+        </div>
         <div id="threads-list"></div>
+
+        <!-- Excluded threads -->
+        <div id="excluded-section" class="ca-excluded-section ca-hidden">
+          <div class="ca-excluded-section__header">
+            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 8h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Excluded by filter rules
+            <span id="excluded-count" class="ca-badge ca-badge--gray">0</span>
+          </div>
+          <div id="excluded-list" class="ca-excluded-section__list"></div>
+        </div>
       </div>
 
       <!-- Analytics tab -->
@@ -137,6 +151,23 @@
   </main>
 
   <footer class="ca-footer">IBM Community Advisor · Built with IBM watsonx.ai · Internal use only</footer>
+
+  <!-- ── Confirmation modal ─────────────────────────────────────────────── -->
+  <div id="ca-modal-overlay" class="ca-modal-overlay ca-hidden" role="dialog" aria-modal="true" aria-labelledby="ca-modal-heading">
+    <div class="ca-modal">
+      <h2 class="ca-modal__heading" id="ca-modal-heading"></h2>
+      <p class="ca-modal__text" id="ca-modal-text"></p>
+      <div class="ca-modal__thread">
+        <span class="ca-modal__thread-product" id="ca-modal-thread-product"></span>
+        <span class="ca-modal__thread-title" id="ca-modal-thread-title"></span>
+      </div>
+      <div class="ca-modal__actions">
+        <button id="ca-modal-confirm2" class="ca-btn ca-btn--primary ca-hidden"></button>
+        <button id="ca-modal-confirm"  class="ca-btn ca-btn--secondary"></button>
+        <button id="ca-modal-cancel"   class="ca-btn ca-btn--ghost">Cancel</button>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

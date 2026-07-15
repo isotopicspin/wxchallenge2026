@@ -1,5 +1,5 @@
 {
-  "exclusions": [],
+  "exclusions": ["webinar"],
   "categories": [
     {
       "id": "ai-powered-productivity",

@@ -80,7 +80,7 @@ Open `config/groups.json` and add words or phrases to the `"exclusions"` array a
 - The server logs how many threads were excluded per product on each scan.
 - Changes take effect on the next scan — no restart required.
 
-### 5. Run
+### 4. Run
 
 ```bash
 npm start

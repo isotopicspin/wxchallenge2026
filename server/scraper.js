@@ -192,22 +192,25 @@ async function fetchThreadBody(threadUrl) {
 }
 
 /**
- * Full scan: returns { open, all }
- *   open — unanswered/open threads enriched with body text (for report tab + draft answers)
- *   all  — every thread title (for theme analytics, includes answered threads)
- * @param {string[]} exclusions - phrases to match against thread titles (case-insensitive); matching threads are dropped
+ * Full scan: returns { open, all, excluded }
+ *   open     — unanswered/open threads enriched with body text (for report tab + draft answers)
+ *   all      — every non-excluded thread (for theme analytics)
+ *   excluded — threads whose title matched an exclusion phrase, shown in their own UI section
+ * @param {string[]} exclusions - phrases to match against thread titles (case-insensitive)
  */
 async function scanGroup(communityKey, productName, limit = 10, exclusions = []) {
   const threads = await fetchThreadList(communityKey, 5);
 
-  // Drop threads whose title contains any excluded phrase
+  // Partition into kept vs excluded
   const lowerExclusions = exclusions.map(e => e.toLowerCase());
-  const filtered = lowerExclusions.length
-    ? threads.filter(t => !lowerExclusions.some(ex => t.title.toLowerCase().includes(ex)))
+  const filtered  = lowerExclusions.length
+    ? threads.filter(t =>  !lowerExclusions.some(ex => t.title.toLowerCase().includes(ex)))
     : threads;
+  const excluded  = lowerExclusions.length
+    ? threads.filter(t =>   lowerExclusions.some(ex => t.title.toLowerCase().includes(ex)))
+    : [];
 
-  const excluded = threads.length - filtered.length;
-  console.log(`[${productName}] scraped ${threads.length} threads (${filtered.filter(t => !t.answered).length} open, ${filtered.filter(t => t.answered).length} answered${excluded ? `, ${excluded} excluded` : ''})`);
+  console.log(`[${productName}] scraped ${threads.length} threads (${filtered.filter(t => !t.answered).length} open, ${filtered.filter(t => t.answered).length} answered${excluded.length ? `, ${excluded.length} excluded` : ''})`);
 
   const open = filtered.filter(t => !t.answered).slice(0, limit);
   const enriched = await Promise.all(open.map(async t => ({
@@ -217,7 +220,9 @@ async function scanGroup(communityKey, productName, limit = 10, exclusions = [])
   })));
 
   const all = filtered.map(t => ({ ...t, product: productName }));
-  return { open: enriched, all };
+  return { open: enriched, all, excluded: excluded.map(t => ({ ...t, product: productName })) };
 }
 
 module.exports = { scanGroup, fetchThreadList, fetchThreadBody };
+
+// Made with Bob

@@ -55,9 +55,10 @@ app.post('/api/scan', async (req, res) => {
       selected.map(p => scanGroup(p.communityKey, p.name, limit, titleExclusions))
     );
     res.json({
-      threads:    results.flatMap(r => r.open),  // unanswered/open — for report tab
-      allThreads: results.flatMap(r => r.all),   // every thread — for analytics
-      scannedAt:  new Date().toISOString(),
+      threads:         results.flatMap(r => r.open),      // unanswered/open — for report tab
+      allThreads:      results.flatMap(r => r.all),        // every thread — for analytics
+      excludedThreads: results.flatMap(r => r.excluded),  // matched exclusion rules — own UI section
+      scannedAt:       new Date().toISOString(),
     });
   } catch (err) {
     console.error('Scan error:', err);
@@ -70,8 +71,8 @@ app.post('/api/draft-answer', async (req, res) => {
   const { thread } = req.body;
   if (!thread?.title) return res.status(400).json({ error: 'thread.title is required' });
   try {
-    const draft = await draftAnswer(thread);
-    res.json({ draft });
+    const { draft, sources } = await draftAnswer(thread);
+    res.json({ draft, sources });
   } catch (err) {
     console.error('Draft error:', err);
     res.status(500).json({ error: err.message });
@@ -113,3 +114,5 @@ app.get('/{*path}', (_req, res) => {
 app.listen(PORT, () =>
   console.log(`Community Advisor running → http://localhost:${PORT}`)
 );
+
+// Made with Bob
