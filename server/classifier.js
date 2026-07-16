@@ -104,7 +104,7 @@ function heuristicClassify(thread) {
   let responseType = 'quick-answer';
   if (OOS_SIGNALS.some(s => text.includes(s))) {
     responseType = 'out-of-scope';
-  } else if (quality === 'incomplete' || CLARIFICATION_HINTS.some(s => text.includes(s)) && !hasBody) {
+  } else if ((quality === 'incomplete' || CLARIFICATION_HINTS.some(s => text.includes(s))) && !hasBody) {
     responseType = 'needs-clarification';
   } else if (INVESTIGATION_HINTS.some(s => text.includes(s))) {
     responseType = 'needs-investigation';
